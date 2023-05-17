@@ -1,0 +1,32 @@
+import numpy as np
+from scipy import signal
+import cv2
+
+def get_dct2(x):
+    return signal.dct(signal.dct(x.T, norm='ortho').T, norm='ortho')
+
+def gaussian_kernel(window_size, sigma):
+    x, y = np.meshgrid(np.linspace(-1, 1, window_size), np.linspace(-1, 1, window_size))
+    d = np.sqrt(x * x + y * y)
+    return np.exp(-(d * d) / (2.0 * sigma * sigma))
+
+def get_feature_vector(image):
+    if len(image.shape) == 3:
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    dct = get_dct2(image.astype(np.float32))
+    dct = np.abs(dct[:8, :8])
+    dct /= np.sum(dct)
+
+    window_size = 7
+    kernel = gaussian_kernel(window_size, window_size / 6.0)
+
+    mu = signal.convolve2d(dct, kernel, mode='same', boundary='symm')
+    mu_sq = mu * mu
+    sigma = np.sqrt(np.abs(signal.convolve2d(dct * dct, kernel, mode='same', boundary='symm') - mu_sq))
+    
+    feature_vector = np.concatenate((mu.ravel(), sigma.ravel()))
+    return feature_vector
+
+
+print(brisque("DCP\\1_outdoor_GT.jpg"))
