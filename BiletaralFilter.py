@@ -191,9 +191,9 @@ for k in range(1,46):
     orj = cv2.imread(folder_path + "\GT/"+ str(k) + "_outdoor_GT.jpg")
     
     orj = cv2.resize(orj, [480, 640])
-    sissiz = r*255
+    sissiz = ab*255
     sissiz = sissiz.astype(np.uint8)
-    
+    print(sissiz.shape)
     img_gray = cv2.cvtColor(sissiz, cv2.COLOR_BGR2GRAY)
     img_gray = img_gray.astype(np.float64)
     
